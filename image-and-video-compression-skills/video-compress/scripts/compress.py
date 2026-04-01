@@ -226,6 +226,7 @@ def compress_video(input_path, output_path, max_size_mb, codec, crf,
                                    target_bitrate_kbps=video_bitrate_kbps)
 
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        two_pass_failed = False
         with tempfile.TemporaryDirectory() as tmpdir:
             passlog = os.path.join(tmpdir, "passlog")
             pass1, pass2 = build_two_pass_commands(
@@ -237,11 +238,25 @@ def compress_video(input_path, output_path, max_size_mb, codec, crf,
             r1 = subprocess.run(pass1, capture_output=True, text=True)
             if r1.returncode != 0:
                 print(f"Warning: Pass 1 failed for {input_path}: {r1.stderr[:200]}", file=sys.stderr)
-                return None
-            print(f"  Pass 2/2: {os.path.basename(input_path)}...", file=sys.stderr)
-            r2 = subprocess.run(pass2, capture_output=True, text=True)
-            if r2.returncode != 0:
-                print(f"Warning: Pass 2 failed for {input_path}: {r2.stderr[:200]}", file=sys.stderr)
+                two_pass_failed = True
+            else:
+                print(f"  Pass 2/2: {os.path.basename(input_path)}...", file=sys.stderr)
+                r2 = subprocess.run(pass2, capture_output=True, text=True)
+                if r2.returncode != 0:
+                    print(f"Warning: Pass 2 failed for {input_path}: {r2.stderr[:200]}", file=sys.stderr)
+                    two_pass_failed = True
+
+        if two_pass_failed:
+            # Fallback: run a single-pass CRF encode instead of failing outright
+            print(f"  Falling back to CRF encode for {os.path.basename(input_path)}", file=sys.stderr)
+            cmd = build_crf_command(
+                input_path, output_path, codec, crf, max_height,
+                audio_bitrate, info["has_audio"], info["height"]
+            )
+            print(f"  Encoding (fallback CRF {crf}): {os.path.basename(input_path)}", file=sys.stderr)
+            r = subprocess.run(cmd, capture_output=True, text=True)
+            if r.returncode != 0:
+                print(f"Warning: ffmpeg failed for {input_path}: {r.stderr[:200]}", file=sys.stderr)
                 return None
     else:
         # CRF mode

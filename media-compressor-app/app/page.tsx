@@ -504,8 +504,8 @@ function VideoCompressor({ onResult }: { onResult: (r: VideoResult | null) => vo
           </div>
         </div>
 
-        <div style={{ display: "flex", gap: 12 }}>
-          <div className="field" style={{ flex: 1 }}>
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+          <div className="field" style={{ flex: "1 1 220px" }}>
             <label className="field-label">Codec</label>
             <select
               className="select"
@@ -522,7 +522,7 @@ function VideoCompressor({ onResult }: { onResult: (r: VideoResult | null) => vo
               </div>
             )}
           </div>
-          <div className="field" style={{ flex: 1 }}>
+          <div className="field" style={{ flex: "1 1 140px" }}>
             <label className="field-label">Audio bitrate</label>
             <input
               className="input"
