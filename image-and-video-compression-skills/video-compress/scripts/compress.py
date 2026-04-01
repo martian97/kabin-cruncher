@@ -42,7 +42,9 @@ FFMPEG = _find_bin("ffmpeg")
 FFPROBE = _find_bin("ffprobe")
 
 CRF_DEFAULTS = {"h264": 23, "h265": 28}
-CODEC_MAP = {"h264": "libx264", "h265": "libx265"}
+# Use encoders that are available in more FFmpeg builds.
+# h264/hevc are native encoders; we already enable yuv420p + profile for compatibility.
+CODEC_MAP = {"h264": "h264", "h265": "hevc"}
 
 
 def probe(input_path):

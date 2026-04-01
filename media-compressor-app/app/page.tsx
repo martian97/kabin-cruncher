@@ -154,7 +154,21 @@ function ImageCompressor({ onResult }: { onResult: (r: ImageResult | null) => vo
       <div className="field-group">
         <div className="field">
           <label className="field-label">Source image</label>
-          <label className="dropzone">
+          <label
+            className="dropzone"
+            onDragOver={(e) => {
+              e.preventDefault();
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              const f = e.dataTransfer.files?.[0];
+              if (f && f.type.startsWith("image/")) {
+                setFile(f);
+                setResult(null);
+                setError(null);
+              }
+            }}
+          >
             <input
               type="file"
               accept="image/*"
@@ -171,7 +185,9 @@ function ImageCompressor({ onResult }: { onResult: (r: ImageResult | null) => vo
             <div className="dropzone-label">
               {file ? file.name : "Drop an image or click to browse"}
             </div>
-            <div className="dropzone-hint">Files are uploaded to Kabin Cruncher, crunched on the server, then ready to download.</div>
+            <div className="dropzone-hint">
+              Files are uploaded to Kabin Cruncher, crunched on the server, then ready to download.
+            </div>
           </label>
         </div>
 
@@ -400,7 +416,21 @@ function VideoCompressor({ onResult }: { onResult: (r: VideoResult | null) => vo
       <div className="field-group">
         <div className="field">
           <label className="field-label">Source video</label>
-          <label className="dropzone">
+          <label
+            className="dropzone"
+            onDragOver={(e) => {
+              e.preventDefault();
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              const f = e.dataTransfer.files?.[0];
+              if (f && f.type.startsWith("video/")) {
+                setFile(f);
+                setResult(null);
+                setError(null);
+              }
+            }}
+          >
             <input
               type="file"
               accept="video/*"
