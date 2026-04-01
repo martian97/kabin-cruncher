@@ -239,13 +239,13 @@ def compress_video(input_path, output_path, max_size_mb, codec, crf,
             print(f"  Pass 1/2: {os.path.basename(input_path)}...", file=sys.stderr)
             r1 = subprocess.run(pass1, capture_output=True, text=True)
             if r1.returncode != 0:
-                print(f"Warning: Pass 1 failed for {input_path}: {r1.stderr[:200]}", file=sys.stderr)
+                print(f"Warning: Pass 1 failed for {input_path}: {r1.stderr}", file=sys.stderr)
                 two_pass_failed = True
             else:
                 print(f"  Pass 2/2: {os.path.basename(input_path)}...", file=sys.stderr)
                 r2 = subprocess.run(pass2, capture_output=True, text=True)
                 if r2.returncode != 0:
-                    print(f"Warning: Pass 2 failed for {input_path}: {r2.stderr[:200]}", file=sys.stderr)
+                    print(f"Warning: Pass 2 failed for {input_path}: {r2.stderr}", file=sys.stderr)
                     two_pass_failed = True
 
         if two_pass_failed:
@@ -258,7 +258,7 @@ def compress_video(input_path, output_path, max_size_mb, codec, crf,
             print(f"  Encoding (fallback CRF {crf}): {os.path.basename(input_path)}", file=sys.stderr)
             r = subprocess.run(cmd, capture_output=True, text=True)
             if r.returncode != 0:
-                print(f"Warning: ffmpeg failed for {input_path}: {r.stderr[:200]}", file=sys.stderr)
+                print(f"Warning: ffmpeg failed for {input_path}: {r.stderr}", file=sys.stderr)
                 return None
     else:
         # CRF mode
@@ -273,7 +273,7 @@ def compress_video(input_path, output_path, max_size_mb, codec, crf,
         print(f"  Encoding: {os.path.basename(input_path)} (CRF {crf})...", file=sys.stderr)
         r = subprocess.run(cmd, capture_output=True, text=True)
         if r.returncode != 0:
-            print(f"Warning: ffmpeg failed for {input_path}: {r.stderr[:200]}", file=sys.stderr)
+            print(f"Warning: ffmpeg failed for {input_path}: {r.stderr}", file=sys.stderr)
             return None
 
     # Read output size
