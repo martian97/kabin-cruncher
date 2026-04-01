@@ -32,6 +32,7 @@ export default function Page() {
   const [tab, setTab] = useState<Tab>("image");
   const [imageResult, setImageResult] = useState<ImageResult | null>(null);
   const [videoResult, setVideoResult] = useState<VideoResult | null>(null);
+  const [showSelfHost, setShowSelfHost] = useState(false);
 
   return (
     <div className="shell">
@@ -66,7 +67,17 @@ export default function Page() {
                 Videos
               </button>
             </div>
-            <div className="tiny-label">Hosted on Railway · Crunch in the cloud</div>
+            <div className="tiny-label">
+              Hosted on Railway · Crunch in the cloud
+            </div>
+            <button
+              type="button"
+              className="ghost-btn"
+              style={{ fontSize: 10, paddingInline: 12, marginTop: 4 }}
+              onClick={() => setShowSelfHost(true)}
+            >
+              Run Kabin Cruncher locally
+            </button>
           </div>
         </div>
 
@@ -78,6 +89,10 @@ export default function Page() {
           )}
           <PreviewPanel tab={tab} image={imageResult} video={videoResult} />
         </div>
+
+        {showSelfHost && (
+          <SelfHostModal onClose={() => setShowSelfHost(false)} />
+        )}
       </div>
     </div>
   );
@@ -448,7 +463,7 @@ function VideoCompressor({ onResult }: { onResult: (r: VideoResult | null) => vo
               {file ? file.name : "Drop a video or click to browse"}
             </div>
             <div className="dropzone-hint">
-              Long clips are supported; Kabin Cruncher does the heavy lifting on the server.
+              For best results on the hosted version, keep inputs at 1080p or below. 720p is ideal. For heavier crunching, run Kabin Cruncher locally.
             </div>
           </label>
         </div>
@@ -700,6 +715,148 @@ function PreviewPanel({
         )}
       </div>
     </section>
+  );
+}
+
+function SelfHostModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.75)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 50,
+        padding: 16
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 520,
+          width: "100%",
+          borderRadius: 16,
+          border: "1px solid rgba(55,65,81,0.9)",
+          background: "radial-gradient(circle at top left, #111827, #020617 60%)",
+          boxShadow: "0 24px 80px rgba(0,0,0,0.9)",
+          padding: 20
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 12
+          }}
+        >
+          <div>
+            <div className="panel-title">Run Kabin Cruncher locally</div>
+            <div className="tiny-label">
+              Maximum power, no hosted limits.
+            </div>
+          </div>
+          <button
+            type="button"
+            className="ghost-btn"
+            onClick={onClose}
+            style={{ paddingInline: 10 }}
+          >
+            Close
+          </button>
+        </div>
+
+        <p className="lede" style={{ fontSize: 13, marginBottom: 10 }}>
+          If you want to crunch very tall or long videos (like 4K HEVC), the hosted version may hit
+          resource limits. You can run the exact same Kabin Cruncher stack on your own machine:
+        </p>
+
+        <ol
+          style={{
+            margin: 0,
+            paddingLeft: 18,
+            fontSize: 12,
+            color: "#d9d9d6",
+            display: "flex",
+            flexDirection: "column",
+            gap: 6
+          }}
+        >
+          <li>
+            <strong>Install prerequisites</strong>: Node 20+, Python 3, ffmpeg, and git.
+          </li>
+          <li>
+            <strong>Clone the repo</strong>:
+            <pre
+              style={{
+                marginTop: 4,
+                padding: 8,
+                borderRadius: 8,
+                background: "rgba(15,23,42,0.9)",
+                border: "1px solid rgba(55,65,81,0.9)",
+                fontSize: 11,
+                overflowX: "auto"
+              }}
+            >
+              <code>git clone https://github.com/martian97/kabin-cruncher.git</code>
+            </pre>
+          </li>
+          <li>
+            <strong>Install dependencies</strong>:
+            <pre
+              style={{
+                marginTop: 4,
+                padding: 8,
+                borderRadius: 8,
+                background: "rgba(15,23,42,0.9)",
+                border: "1px solid rgba(55,65,81,0.9)",
+                fontSize: 11,
+                overflowX: "auto"
+              }}
+            >
+              <code>
+                cd kabin-cruncher
+                {"\n"}
+                cd media-compressor-app
+                {"\n"}
+                npm install
+                {"\n"}
+                cd ..
+                {"\n"}
+                pip3 install Pillow
+              </code>
+            </pre>
+          </li>
+          <li>
+            <strong>Run the dev server</strong>:
+            <pre
+              style={{
+                marginTop: 4,
+                padding: 8,
+                borderRadius: 8,
+                background: "rgba(15,23,42,0.9)",
+                border: "1px solid rgba(55,65,81,0.9)",
+                fontSize: 11,
+                overflowX: "auto"
+              }}
+            >
+              <code>
+                cd media-compressor-app
+                {"\n"}
+                npm run dev
+              </code>
+            </pre>
+            Then open <code>http://localhost:3000</code> in your browser.
+          </li>
+        </ol>
+
+        <p className="tiny-label" style={{ marginTop: 12 }}>
+          Tip: for a one-liner experience you can also build and run the Docker image from the repo
+          README, then your local browser talks to a containerized Kabin Cruncher.
+        </p>
+      </div>
+    </div>
   );
 }
 
